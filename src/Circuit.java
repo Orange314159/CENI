@@ -25,20 +25,23 @@ public class Circuit<T> {
         }
     }
 
-    public void addWire(T source, T destination, double resistance) {
+    public void addWire(T source, T destination, double resistivity, int length) {
         if (source == null || destination == null) {
             throw new IllegalArgumentException("Source and destination cannot be null");
         }
-        if (resistance < 0) {
+        if (resistivity < 0) {
             throw new IllegalArgumentException("Resistance must be positive");
+        }
+        if (length < 0) {
+            throw new IllegalArgumentException("Length must be positive");
         }
 
         // check if source and destination in adjacency list, if not add them
         adjacencyList.computeIfAbsent(source, k -> new ArrayList<>());
 
         // add the wire to the adjacency list (ciruit is undirected)
-        adjacencyList.get(source).add(new Wire<>(destination, resistance));
-        adjacencyList.get(destination).add(new Wire<>(source, resistance));
+        adjacencyList.get(source).add(new Wire<>(destination, resistivity, length));
+        adjacencyList.get(destination).add(new Wire<>(source, resistivity, length));
     }
 
     public List<Wire<T>> getWires(T component) {
@@ -124,14 +127,12 @@ public class Circuit<T> {
         List<Wire<T>> wires = getWires(source);
         for (Wire<T> wire : wires) {
             if (wire.destination.equals(destination)) {
-                return wire.resistance;
+                return wire.getResistance();
             }
         }
         // a wire should be found between source and destination because we checked if the destination is in the connected components of the source
         throw new IllegalArgumentException("Wire not found between source and destination");
     }
-
-
 
 
     
